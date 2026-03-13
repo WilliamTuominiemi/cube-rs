@@ -1,16 +1,30 @@
 #[derive(PartialEq, Debug)]
 pub struct Position2D {
-    x: f32,
-    y: f32,
+    pub x: f32,
+    pub y: f32,
 }
 
-impl Position2D {}
+impl Position2D {
+    pub fn position_in_terminal_scale(
+        &self,
+        terminal_width: u32,
+        terminal_height: u32,
+    ) -> Position2D {
+        let mapped_x = (self.x + 1.0) / 2.0 * terminal_width as f32;
+        let mapped_y = (self.y + 1.0) / 2.0 * terminal_height as f32;
+
+        Position2D {
+            x: mapped_x,
+            y: mapped_y,
+        }
+    }
+}
 
 #[derive(PartialEq)]
 pub struct Position3D {
-    x: f32,
-    y: f32,
-    z: f32,
+    pub x: f32,
+    pub y: f32,
+    pub z: f32,
 }
 
 impl Position3D {
@@ -52,6 +66,29 @@ mod tests {
         assert_eq!(
             negative_position.transform_position_to_2d(),
             negative_expected_position
+        );
+    }
+
+    #[test]
+    fn test_transforming_position_into_terminal_scale() {
+        let (terminal_width, terminal_height) = (20, 10);
+
+        let position = Position2D { x: 0.8, y: 0.6 };
+
+        let expected_terminal_scale_position = Position2D { x: 18.0, y: 8.0 };
+
+        assert_eq!(
+            position.position_in_terminal_scale(terminal_width, terminal_height),
+            expected_terminal_scale_position
+        );
+
+        let negative_position = Position2D { x: -0.8, y: -0.6 };
+
+        let expected_negative_terminal_scale_position = Position2D { x: 2.0, y: 2.0 };
+
+        assert_eq!(
+            negative_position.position_in_terminal_scale(terminal_width, terminal_height),
+            expected_negative_terminal_scale_position
         );
     }
 }

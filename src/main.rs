@@ -5,31 +5,32 @@ use crossterm::{
 };
 use std::io::{self, Write};
 
+mod cube;
 mod position;
+
+use crate::cube::Cube;
+
 fn main() -> io::Result<()> {
+    let width = 20;
+    let height = 10;
+
+    let cube = Cube::new();
+
     let mut stdout = io::stdout();
 
     stdout.execute(terminal::Clear(terminal::ClearType::All))?;
 
-    let style: style::PrintStyledContent<&str> = style::PrintStyledContent("╬╬╬╬╬╬╬╬╬╬╬".magenta());
-    stdout
-        .queue(cursor::MoveTo(0, 0))?
-        .queue(style::PrintStyledContent("╬╬╬╬╬╬╬╬╬╬╬".magenta()))?;
-    stdout
-        .queue(cursor::MoveTo(0, 1))?
-        .queue(style::PrintStyledContent("███████████".red()))?;
-    stdout
-        .queue(cursor::MoveTo(0, 2))?
-        .queue(style::PrintStyledContent("▓▓▓▓▓▓▓▓▓▓▓".green()))?;
-    stdout
-        .queue(cursor::MoveTo(0, 3))?
-        .queue(style::PrintStyledContent("▒▒▒▒▒▒▒▒▒▒▒".blue()))?;
-    stdout
-        .queue(cursor::MoveTo(0, 4))?
-        .queue(style::PrintStyledContent("░░░░░░░░░░░".yellow()))?;
-    stdout
-        .queue(cursor::MoveTo(0, 5))?
-        .queue(style::PrintStyledContent("##########".cyan()))?;
+    for corner in cube.corners {
+        let position2d = corner.transform_position_to_2d();
+        let calculated_position = position2d.position_in_terminal_scale(width, height);
+        stdout
+            .queue(cursor::MoveTo(
+                calculated_position.x as u16,
+                calculated_position.y as u16,
+            ))?
+            .queue(style::PrintStyledContent("▆".magenta()))?;
+    }
+
     stdout.flush()?;
     Ok(())
 }
