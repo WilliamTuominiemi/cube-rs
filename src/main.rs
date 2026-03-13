@@ -44,6 +44,18 @@ fn main() -> io::Result<()> {
                 ))?
                 .queue(style::PrintStyledContent("▆".magenta()))?;
         }
+
+        for line in &cube.get_lines() {
+            let position2d = line.transform_position_to_2d();
+            let calculated_position = position2d.position_in_terminal_scale(width, height);
+            stdout
+                .queue(cursor::MoveTo(
+                    calculated_position.x as u16 + 2,
+                    calculated_position.y as u16 + 2,
+                ))?
+                .queue(style::PrintStyledContent("•".magenta()))?;
+        }
+
         stdout.flush()?;
         std::thread::sleep(Duration::from_millis(10));
     }

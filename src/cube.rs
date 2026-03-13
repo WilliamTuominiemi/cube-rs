@@ -1,4 +1,4 @@
-use crate::position::Position3D;
+use crate::position::{self, Position3D};
 
 pub struct Cube {
     pub corners: [Position3D; 8],
@@ -64,5 +64,30 @@ impl Cube {
             position.x = old_x * c - old_z * s;
             position.z = old_x * s + old_z * c;
         }
+    }
+
+    pub fn get_lines(&self) -> Vec<Position3D> {
+        let left_bottom_back = &self.corners[0];
+        let right_bottom_back = &self.corners[1];
+
+        self.get_line_between_points(left_bottom_back, right_bottom_back, 6)
+    }
+
+    fn get_line_between_points(
+        &self,
+        first: &Position3D,
+        second: &Position3D,
+        points: usize,
+    ) -> Vec<Position3D> {
+        (0..points)
+            .map(|i| {
+                let t = i as f32 / (points - 1) as f32;
+                Position3D {
+                    x: first.x + (second.x - first.x) * t,
+                    y: first.y + (second.y - first.y) * t,
+                    z: first.z + (second.z - first.z) * t,
+                }
+            })
+            .collect()
     }
 }
