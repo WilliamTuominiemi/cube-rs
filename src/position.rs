@@ -29,10 +29,12 @@ pub struct Position3D {
 
 impl Position3D {
     pub fn transform_position_to_2d(&self) -> Position2D {
-        return Position2D {
-            x: self.x / self.z,
-            y: self.y / self.z,
-        };
+        let camera_distance = 2.0;
+        let z_projected = self.z + camera_distance;
+        Position2D {
+            x: self.x / z_projected,
+            y: self.y / z_projected,
+        }
     }
 }
 
@@ -44,24 +46,21 @@ mod tests {
     fn test_transforming_position_from_3d_to_2d() {
         let position = Position3D {
             x: 0.7,
-            y: 0.3,
-            z: 0.8,
+            y: 0.4,
+            z: 0.5,
         };
 
-        let expected_position = Position2D { x: 0.875, y: 0.375 };
+        let expected_position = Position2D { x: 0.28, y: 0.16 };
 
         assert_eq!(position.transform_position_to_2d(), expected_position);
 
         let negative_position = Position3D {
             x: -0.7,
-            y: -0.3,
-            z: 0.8,
+            y: -0.4,
+            z: 0.5,
         };
 
-        let negative_expected_position = Position2D {
-            x: -0.875,
-            y: -0.375,
-        };
+        let negative_expected_position = Position2D { x: -0.28, y: -0.16 };
 
         assert_eq!(
             negative_position.transform_position_to_2d(),
@@ -82,9 +81,9 @@ mod tests {
             expected_terminal_scale_position
         );
 
-        let negative_position = Position2D { x: -0.8, y: -0.6 };
+        let negative_position = Position2D { x: -0.5, y: -0.7 };
 
-        let expected_negative_terminal_scale_position = Position2D { x: 2.0, y: 2.0 };
+        let expected_negative_terminal_scale_position = Position2D { x: 5.0, y: 1.5 };
 
         assert_eq!(
             negative_position.position_in_terminal_scale(terminal_width, terminal_height),

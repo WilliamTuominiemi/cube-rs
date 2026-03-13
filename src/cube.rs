@@ -53,4 +53,16 @@ impl Cube {
             ],
         }
     }
+
+    pub fn apply_xz_rotation(&mut self, angle: f32) {
+        let c = angle.cos();
+        let s = angle.sin();
+
+        for position in &mut self.corners {
+            let old_x = position.x;
+            let old_z = position.z;
+            position.x = old_x * c - old_z * s;
+            position.z = old_x * s + old_z * c;
+        }
+    }
 }
