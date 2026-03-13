@@ -1,7 +1,7 @@
 use crossterm::{
     ExecutableCommand, QueueableCommand, cursor,
     style::{self, Stylize},
-    terminal,
+    terminal::{self, EnterAlternateScreen, LeaveAlternateScreen},
 };
 use std::io::{self, Write};
 
@@ -18,6 +18,8 @@ fn main() -> io::Result<()> {
 
     let mut stdout = io::stdout();
 
+    stdout.execute(EnterAlternateScreen)?;
+    stdout.execute(cursor::Hide)?;
     stdout.execute(terminal::Clear(terminal::ClearType::All))?;
 
     cube.apply_xz_rotation(20.0_f32.to_radians());
@@ -32,7 +34,11 @@ fn main() -> io::Result<()> {
             ))?
             .queue(style::PrintStyledContent("▆".magenta()))?;
     }
-
     stdout.flush()?;
+    std::thread::sleep(std::time::Duration::from_secs(3));
+
+    stdout.execute(cursor::Show)?;
+    stdout.execute(LeaveAlternateScreen)?;
+
     Ok(())
 }
