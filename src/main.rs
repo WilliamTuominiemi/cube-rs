@@ -5,11 +5,13 @@ use crossterm::{
 };
 use std::io::{self, Write};
 
+mod position;
 fn main() -> io::Result<()> {
     let mut stdout = io::stdout();
 
     stdout.execute(terminal::Clear(terminal::ClearType::All))?;
 
+    let style: style::PrintStyledContent<&str> = style::PrintStyledContent("╬╬╬╬╬╬╬╬╬╬╬".magenta());
     stdout
         .queue(cursor::MoveTo(0, 0))?
         .queue(style::PrintStyledContent("╬╬╬╬╬╬╬╬╬╬╬".magenta()))?;
