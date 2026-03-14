@@ -53,8 +53,6 @@ impl Position3D {
 
 #[cfg(test)]
 mod tests {
-    use crate::position;
-
     use super::*;
 
     #[test]

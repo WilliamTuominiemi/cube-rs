@@ -24,10 +24,10 @@ fn main() -> io::Result<()> {
     stdout.execute(cursor::Hide)?;
     terminal::enable_raw_mode()?;
     while !quit {
-        if event::poll(Duration::from_millis(100))? {
-            if let Event::Key(_) = event::read()? {
-                quit = true;
-            }
+        if event::poll(Duration::from_millis(100))?
+            && let Event::Key(_) = event::read()?
+        {
+            quit = true;
         }
 
         stdout.execute(terminal::Clear(terminal::ClearType::All))?;

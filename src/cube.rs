@@ -78,7 +78,7 @@ impl Cube {
 
         let p = 6;
 
-        let lines = left_bottom_back
+        left_bottom_back
             .get_line_to(right_bottom_back, p)
             .into_iter()
             .chain(left_bottom_front.get_line_to(right_bottom_front, p))
@@ -92,9 +92,7 @@ impl Cube {
             .chain(right_bottom_back.get_line_to(right_top_back, p))
             .chain(left_bottom_front.get_line_to(left_top_front, p))
             .chain(right_bottom_front.get_line_to(right_top_front, p))
-            .collect();
-
-        lines
+            .collect()
     }
 }
 
