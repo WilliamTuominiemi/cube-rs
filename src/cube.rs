@@ -1,4 +1,4 @@
-use crate::position::{self, Position3D};
+use crate::position::Position3D;
 
 pub struct Cube {
     pub corners: [Position3D; 8],
@@ -69,25 +69,96 @@ impl Cube {
     pub fn get_lines(&self) -> Vec<Position3D> {
         let left_bottom_back = &self.corners[0];
         let right_bottom_back = &self.corners[1];
+        let left_bottom_front = &self.corners[2];
+        let right_bottom_front = &self.corners[3];
+        let left_top_back = &self.corners[4];
+        let right_top_back = &self.corners[5];
+        let left_top_front = &self.corners[6];
+        let right_top_front = &self.corners[7];
 
-        self.get_line_between_points(left_bottom_back, right_bottom_back, 6)
+        let p = 6;
+
+        let lines = left_bottom_back
+            .get_line_to(right_bottom_back, p)
+            .into_iter()
+            .chain(left_bottom_front.get_line_to(right_bottom_front, p))
+            .chain(left_top_back.get_line_to(right_top_back, p))
+            .chain(left_top_front.get_line_to(right_top_front, p))
+            .chain(left_bottom_front.get_line_to(left_bottom_back, p))
+            .chain(right_bottom_front.get_line_to(right_bottom_back, p))
+            .chain(left_top_front.get_line_to(left_top_back, p))
+            .chain(right_top_front.get_line_to(right_top_back, p))
+            .chain(left_bottom_back.get_line_to(left_top_back, p))
+            .chain(right_bottom_back.get_line_to(right_top_back, p))
+            .chain(left_bottom_front.get_line_to(left_top_front, p))
+            .chain(right_bottom_front.get_line_to(right_top_front, p))
+            .collect();
+
+        lines
     }
+}
 
-    fn get_line_between_points(
-        &self,
-        first: &Position3D,
-        second: &Position3D,
-        points: usize,
-    ) -> Vec<Position3D> {
-        (0..points)
-            .map(|i| {
-                let t = i as f32 / (points - 1) as f32;
-                Position3D {
-                    x: first.x + (second.x - first.x) * t,
-                    y: first.y + (second.y - first.y) * t,
-                    z: first.z + (second.z - first.z) * t,
-                }
-            })
-            .collect()
+#[cfg(test)]
+
+mod tests {
+    use std::f32::consts::PI;
+
+    use super::*;
+
+    #[test]
+    fn test_applying_xz_rotation() {
+        let mut cube = Cube::new();
+
+        let expected_corners = [
+            Position3D {
+                x: 1.0,
+                y: -1.0,
+                z: -1.0,
+            },
+            Position3D {
+                x: 1.0,
+                y: -1.0,
+                z: 1.0,
+            },
+            Position3D {
+                x: -1.0,
+                y: -1.0,
+                z: -1.0,
+            },
+            Position3D {
+                x: -1.0,
+                y: -1.0,
+                z: 1.0,
+            },
+            Position3D {
+                x: 1.0,
+                y: 1.0,
+                z: -1.0,
+            },
+            Position3D {
+                x: 1.0,
+                y: 1.0,
+                z: 1.0,
+            },
+            Position3D {
+                x: -1.0,
+                y: 1.0,
+                z: -1.0,
+            },
+            Position3D {
+                x: -1.0,
+                y: 1.0,
+                z: 1.0,
+            },
+        ];
+
+        cube.apply_xz_rotation(PI / 2.0);
+
+        let epsilon = 1e-7;
+        for (actual, expected) in cube.corners.iter().zip(expected_corners.iter()) {
+            assert!((actual.x - expected.x).abs() < epsilon,);
+            assert!((actual.y - expected.y).abs() < epsilon,);
+            assert!((actual.z - expected.z).abs() < epsilon,);
+        }
     }
 }

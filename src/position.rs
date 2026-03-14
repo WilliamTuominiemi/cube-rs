@@ -20,7 +20,7 @@ impl Position2D {
     }
 }
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Debug)]
 pub struct Position3D {
     pub x: f32,
     pub y: f32,
@@ -36,10 +36,25 @@ impl Position3D {
             y: self.y / z_projected,
         }
     }
+
+    pub fn get_line_to(&self, other: &Position3D, points: usize) -> Vec<Position3D> {
+        (0..points)
+            .map(|i| {
+                let t = i as f32 / (points - 1) as f32;
+                Position3D {
+                    x: self.x + (other.x - self.x) * t,
+                    y: self.y + (other.y - self.y) * t,
+                    z: self.z + (other.z - self.z) * t,
+                }
+            })
+            .collect()
+    }
 }
 
 #[cfg(test)]
 mod tests {
+    use crate::position;
+
     use super::*;
 
     #[test]
@@ -88,6 +103,56 @@ mod tests {
         assert_eq!(
             negative_position.position_in_terminal_scale(terminal_width, terminal_height),
             expected_negative_terminal_scale_position
+        );
+    }
+
+    #[test]
+
+    fn test_creating_line_between_two_points() {
+        let position = Position3D {
+            x: -1.0,
+            y: 1.0,
+            z: 1.0,
+        };
+        let other_position = Position3D {
+            x: 1.0,
+            y: -1.0,
+            z: -1.0,
+        };
+
+        let amount_of_points = 5;
+
+        let expected_line = vec![
+            Position3D {
+                x: -1.0,
+                y: 1.0,
+                z: 1.0,
+            },
+            Position3D {
+                x: -0.5,
+                y: 0.5,
+                z: 0.5,
+            },
+            Position3D {
+                x: 0.0,
+                y: 0.0,
+                z: 0.0,
+            },
+            Position3D {
+                x: 0.5,
+                y: -0.5,
+                z: -0.5,
+            },
+            Position3D {
+                x: 1.0,
+                y: -1.0,
+                z: -1.0,
+            },
+        ];
+
+        assert_eq!(
+            position.get_line_to(&other_position, amount_of_points),
+            expected_line
         );
     }
 }
